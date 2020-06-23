@@ -27,6 +27,7 @@
                     <span style="color:red">{{$errors->first('password')}}</span>
                 </td>
             </tr>
+            <font color="red">{{session('msg')}}</font>
             <tr>
                 <td><input type="submit" value="登陆"></td>
             </tr>

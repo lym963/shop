@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Model\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
 class LoginController extends Controller
 {
@@ -24,8 +25,11 @@ class LoginController extends Controller
                         "last_ip"=>request()->getClientIp()
                     ];
                     UserModel::where("user_id",$res->user_id)->update($arr);
+                    setcookie("user",$res->user_name);
+                    return redirect("user/center");
                 }
             }
+            return redirect("user/login")->with("msg","用户或密码错误");
         }
     }
 }

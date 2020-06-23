@@ -34,7 +34,7 @@ class RegController extends Controller
             $data["reg_time"]=time();
             $resutl=UserModel::create($data);
             if($resutl){
-                return redirect("/get/user/login");
+                return redirect("/user/login");
             }
         }
     }
