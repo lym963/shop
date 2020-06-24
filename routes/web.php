@@ -27,3 +27,10 @@ Route::any("/user/login","User\LoginController@login");
 //个人中心
 Route::any("/user/center","User\CenterController@center");
 
+
+//Api
+Route::any("api/user/reg","Api\UserController@reg");  //注册
+
+Route::any("api/user/login","Api\UserController@login");  //登陆
+
+Route::any("api/user/center","Api\UserController@center");  //个人中心
