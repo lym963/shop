@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Model\TokenModel;
 use App\Model\UserModel;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -94,7 +95,10 @@ class UserController extends Controller
                 //生成token
                 $token=md5($res->user_id.rand(100000,999999).time());
                 $access_token=substr($token,5,15).substr($token,10,15).substr($token,15,15);
-                TokenModel::create(["user_id"=>$res->user_id,"access_token"=>$access_token,"create_time"=>time()]);
+                //讲access_token存入redis
+                Redis::set($access_token,$res->user_id);
+                //讲access_token存入数据库
+//                TokenModel::create(["user_id"=>$res->user_id,"access_token"=>$access_token,"create_time"=>time()]);
                 return $this->response(0,"登陆成功",$access_token);
             }
         }
@@ -111,40 +115,17 @@ class UserController extends Controller
             return $this->response(50000,"请求方法不正确");
         }
         $access_token=request()->get("access_token");
-        //判断不为空
-        if(empty($access_token)){
-            return $this->response(50001,"参数缺失");
-        }
-        //判断是否登陆
-        $res=TokenModel::where("access_token",$access_token)->first();
-        if($res){
-            $user=UserModel::where("user_id",$res->user_id)->first();
-            $data=[
-                "user_name"=>$user->user_name,
-                "user_email"=>$user->user_email,
-                "reg_time"=>$user->reg_time,
-                "last_login"=>$user->last_login
-            ];
-            return $this->response(0,"成功","",$data);
-        }
-        return $this->response(1,"失败");
-    }
-
-
-    /*
-     *返回数据
-     */
-    public function response($error,$msg,$access_token="",$data=[]){
-        $arr=[
-            "error"=>$error,
-            "msg"=>$msg,
+        $user_id=Redis::get($access_token);
+        $user=UserModel::where("user_id",$user_id)->first();
+        $data=[
+            "user_name"=>$user->user_name,
+            "user_email"=>$user->user_email,
+            "reg_time"=>$user->reg_time,
+            "last_login"=>$user->last_login
         ];
-        if($access_token){
-            $arr["access_token"]=$access_token;
-        }
-        if($data){
-            $arr["data"]=$data;
-        }
-        return $arr;
+        return $this->response(0,"成功","",$data);
     }
+
+
+
 }

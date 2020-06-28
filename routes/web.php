@@ -33,4 +33,6 @@ Route::any("api/user/reg","Api\UserController@reg");  //注册
 
 Route::any("api/user/login","Api\UserController@login");  //登陆
 
-Route::any("api/user/center","Api\UserController@center");  //个人中心
+Route::middleware("token","total")->group(function (){
+    Route::any("api/user/center","Api\UserController@center");  //个人中心
+});
